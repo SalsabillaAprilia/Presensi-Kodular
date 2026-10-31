@@ -1,0 +1,1270 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Smart Attendance – Presensi Guru & Pegawai</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    /* =============================================
+       RESET & DESIGN SYSTEM
+    ============================================= */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    :root {
+      --navy-950: #060d17;
+      --navy-900: #0a192f;
+      --navy-850: #0f2444;
+      --gold-500: #c59b27;
+      --gold-400: #d4af37;
+      
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --primary-light: #eff6ff;
+      --accent: #0ea5e9;
+      --success: #10b981;
+      --success-light: #ecfdf5;
+      --warning: #f59e0b;
+      --warning-light: #fffbeb;
+      --danger: #ef4444;
+      --danger-light: #fef2f2;
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --radius: 16px;
+      --shadow-sm: 0 1px 3px rgba(10,25,47,0.06);
+      --shadow: 0 4px 20px -2px rgba(10,25,47,0.08);
+      --shadow-lg: 0 12px 32px -4px rgba(10,25,47,0.16);
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      background: var(--navy-950);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: stretch;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Mobile Container Wrapper */
+    .app-viewport {
+      width: 100%;
+      max-width: 440px;
+      min-height: 100vh;
+      background: var(--bg);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 0 50px rgba(0,0,0,0.5);
+      overflow-x: hidden;
+    }
+
+    /* Page Navigation show/hide */
+    .page { display: none !important; width: 100%; }
+    .page.active { display: flex !important; flex-direction: column; flex: 1; }
+
+    /* =============================================
+       PAGE: LOGIN
+    ============================================= */
+    #page-login.active {
+      min-height: 100vh;
+      background: 
+        radial-gradient(circle at 50% 12%, rgba(212, 175, 55, 0.14) 0%, transparent 60%),
+        linear-gradient(160deg, #060d17 0%, #0a192f 50%, #0f2444 100%);
+      padding: 32px 24px;
+      justify-content: center;
+      color: #fff;
+    }
+
+    .login-brand {
+      text-align: center;
+      margin-bottom: 26px;
+    }
+    .brand-icon {
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, var(--navy-900), var(--navy-850));
+      border: 1.5px solid var(--gold-400);
+      border-radius: 18px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--gold-400);
+      margin-bottom: 14px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    }
+    .login-brand h1 {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      color: #fff;
+    }
+    .login-brand p {
+      font-size: 11.5px;
+      color: var(--gold-400);
+      text-transform: uppercase;
+      letter-spacing: 0.9px;
+      font-weight: 700;
+      margin-top: 4px;
+    }
+
+    .login-card {
+      background: var(--card);
+      color: var(--text);
+      border-radius: 20px;
+      padding: 26px 20px;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid rgba(255,255,255,0.15);
+    }
+    .login-card h2 {
+      font-size: 17px;
+      font-weight: 800;
+      margin-bottom: 18px;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+    .form-group label {
+      display: block;
+      font-size: 11.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .form-input-wrap {
+      position: relative;
+    }
+    .form-group input {
+      width: 100%;
+      padding: 13px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      font-size: 14.5px;
+      font-family: inherit;
+      color: var(--text);
+      background: #f8fafc;
+      transition: all 0.2s;
+    }
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--primary);
+      background: #fff;
+      box-shadow: 0 0 0 4px rgba(37,99,235,0.12);
+    }
+    .btn-eye {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px;
+    }
+    .btn-eye:hover {
+      color: var(--text);
+    }
+
+    .login-helper {
+      font-size: 11.5px;
+      color: var(--muted);
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      padding: 10px 12px;
+      border-radius: 10px;
+      margin-top: 16px;
+      line-height: 1.45;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      text-align: left;
+    }
+
+    .login-portal-link {
+      margin-top: 24px;
+      text-align: center;
+    }
+    .login-portal-link a {
+      color: #cbd5e1;
+      font-size: 12px;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      transition: all 0.2s;
+    }
+    .login-portal-link a:hover {
+      background: rgba(255,255,255,0.14);
+      color: #fff;
+    }
+
+    /* =============================================
+       PAGE: DASHBOARD (HOME)
+    ============================================= */
+    .topbar {
+      background: var(--navy-900);
+      color: #fff;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      border-bottom: 1px solid rgba(197, 155, 39, 0.25);
+      box-shadow: 0 4px 16px rgba(6,13,23,0.3);
+    }
+    .user-profile-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.08);
+      border: 1.5px solid rgba(197, 155, 39, 0.4);
+      color: var(--gold-400);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .user-info-text {
+      line-height: 1.25;
+    }
+    .user-nama {
+      font-size: 14.5px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -0.2px;
+    }
+    .user-meta {
+      font-size: 11px;
+      color: var(--gold-400);
+      font-weight: 600;
+      margin-top: 2px;
+    }
+
+    .btn-logout {
+      background: rgba(255,255,255,0.08);
+      color: #cbd5e1;
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 8px;
+      padding: 6px 11px;
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .btn-logout:hover {
+      background: rgba(255,255,255,0.18);
+      color: #fff;
+    }
+
+    /* Tab Navigation */
+    .tab-bar {
+      display: flex;
+      background: #ffffff;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 69px;
+      z-index: 30;
+      box-shadow: var(--shadow-sm);
+    }
+    .tab-btn {
+      flex: 1;
+      padding: 12px 8px;
+      background: none;
+      border: none;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      border-bottom: 2.5px solid transparent;
+      transition: all 0.2s;
+    }
+    .tab-btn.active {
+      color: #0a192f;
+      border-bottom-color: var(--primary);
+      background: #f8fafc;
+    }
+
+    .tab-content {
+      display: none;
+      padding: 16px;
+      flex: 1;
+    }
+    .tab-content.active {
+      display: block;
+    }
+
+    /* Cards */
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 16px;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border);
+      margin-bottom: 14px;
+    }
+    .card-title {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    /* Time & Status Widget */
+    .time-card {
+      background: linear-gradient(145deg, #0a192f 0%, #0f2444 100%);
+      border: 1px solid rgba(197, 155, 39, 0.25);
+      color: #fff;
+      padding: 18px 16px;
+      text-align: center;
+      border-radius: var(--radius);
+      box-shadow: 0 4px 18px rgba(10, 25, 47, 0.14);
+    }
+    .time-date {
+      font-size: 11.5px;
+      color: var(--gold-400);
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .time-clock {
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      font-variant-numeric: tabular-nums;
+      color: #ffffff;
+    }
+    .status-badge-wrap {
+      margin-top: 10px;
+    }
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 11.5px;
+      font-weight: 700;
+    }
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+    .status-badge-idle {
+      background: rgba(255,255,255,0.12);
+      color: #cbd5e1;
+    }
+    .status-badge-hadir {
+      background: rgba(16, 185, 129, 0.2);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.35);
+    }
+    .status-badge-terlambat {
+      background: rgba(245, 158, 11, 0.2);
+      color: #fbbf24;
+      border: 1px solid rgba(245, 158, 11, 0.35);
+    }
+    .status-badge-pulang {
+      background: rgba(37, 99, 235, 0.25);
+      color: #60a5fa;
+      border: 1px solid rgba(37, 99, 235, 0.4);
+    }
+
+    /* GPS Map Widget */
+    #map {
+      height: 180px;
+      border-radius: 12px;
+      border: 1.5px solid var(--border);
+      margin-bottom: 10px;
+      z-index: 1;
+    }
+    .gps-info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      font-size: 12px;
+      margin-bottom: 10px;
+    }
+    .gps-info-item {
+      background: #f8fafc;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+    .gps-info-item span:first-child {
+      display: block;
+      color: var(--muted);
+      font-size: 10.5px;
+      margin-bottom: 2px;
+      font-weight: 600;
+    }
+    .gps-info-item span:last-child {
+      font-weight: 700;
+      color: #1e293b;
+    }
+    .gps-status-box {
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .gps-in-radius {
+      background: var(--success-light);
+      color: #065f46;
+      border: 1px solid #a7f3d0;
+    }
+    .gps-out-radius {
+      background: var(--danger-light);
+      color: #991b1b;
+      border: 1px solid #fecaca;
+    }
+
+    /* Action Buttons (Absen Masuk & Pulang) */
+    .action-panel {
+      margin-top: 6px;
+      margin-bottom: 20px;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 14px 18px;
+      border-radius: 14px;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+    .btn:active {
+      transform: scale(0.98);
+    }
+    .btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .btn-masuk {
+      background: linear-gradient(135deg, #1d4ed8, #2563eb);
+      color: #fff;
+      box-shadow: 0 6px 18px rgba(37,99,235,0.35);
+    }
+    .btn-masuk:hover:not(:disabled) {
+      background: linear-gradient(135deg, #1e40af, #1d4ed8);
+    }
+    .btn-pulang {
+      background: linear-gradient(135deg, #059669, #10b981);
+      color: #fff;
+      box-shadow: 0 6px 18px rgba(16,185,129,0.35);
+    }
+    .btn-pulang:hover:not(:disabled) {
+      background: linear-gradient(135deg, #047857, #059669);
+    }
+    .btn-secondary {
+      background: #f1f5f9;
+      color: #334155;
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover:not(:disabled) {
+      background: #e2e8f0;
+    }
+    .btn-sm {
+      padding: 8px 14px;
+      font-size: 12px;
+      border-radius: 8px;
+    }
+
+    /* Completed state card */
+    .card-completed {
+      background: #f0fdf4;
+      border: 1.5px solid #86efac;
+      text-align: center;
+      padding: 24px 18px;
+      border-radius: var(--radius);
+      margin-bottom: 14px;
+    }
+    .completed-icon-wrap {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: #dcfce7;
+      color: #16a34a;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 10px;
+    }
+    .card-completed h3 {
+      font-size: 15.5px;
+      font-weight: 800;
+      color: #166534;
+      margin-bottom: 4px;
+    }
+    .card-completed p {
+      font-size: 12.5px;
+      color: #15803d;
+      line-height: 1.45;
+    }
+
+    .masuk-success-banner {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-bottom: 12px;
+      font-size: 12.5px;
+      color: #1e40af;
+      line-height: 1.45;
+    }
+    .masuk-banner-header {
+      font-weight: 700;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: #1d4ed8;
+    }
+
+    /* Alert */
+    .alert {
+      display: none;
+      padding: 12px 14px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 12px;
+      line-height: 1.4;
+    }
+    .alert.show { display: block; }
+    .alert-success { background: var(--success-light); color: #065f46; border: 1px solid #a7f3d0; }
+    .alert-error   { background: var(--danger-light);  color: #991b1b; border: 1px solid #fecaca; }
+    .alert-info    { background: var(--primary-light); color: #1e40af; border: 1px solid #bfdbfe; }
+
+    /* =============================================
+       MODAL: FOTO POP-UP (KAMERA WEBCAM)
+    ============================================= */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(6,13,23,0.85);
+      backdrop-filter: blur(6px);
+      z-index: 999;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .modal-overlay.active {
+      display: flex;
+    }
+    .modal-card {
+      background: #fff;
+      border-radius: 24px;
+      width: 100%;
+      max-width: 400px;
+      overflow: hidden;
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+      animation: modalSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes modalSlideUp {
+      from { transform: translateY(20px) scale(0.96); opacity: 0; }
+      to   { transform: translateY(0) scale(1); opacity: 1; }
+    }
+    .modal-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .modal-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #1e293b;
+    }
+    .btn-close-modal {
+      background: #f1f5f9;
+      border: none;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #64748b;
+      transition: all 0.2s;
+    }
+    .btn-close-modal:hover {
+      background: #e2e8f0;
+      color: #0f172a;
+    }
+    .modal-body {
+      padding: 16px;
+    }
+    .camera-frame {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 4/3;
+      background: #000;
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 14px;
+    }
+    .camera-frame video,
+    .camera-frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .camera-overlay-badge {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: rgba(0,0,0,0.65);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 20px;
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .live-indicator-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #ef4444;
+      box-shadow: 0 0 6px #ef4444;
+      animation: pulseDot 1.5s infinite;
+    }
+    @keyframes pulseDot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.3; transform: scale(0.85); }
+    }
+    .modal-footer {
+      display: flex;
+      gap: 10px;
+    }
+    .modal-footer .btn {
+      flex: 1;
+    }
+
+    /* Modal Zoom View Foto */
+    #modal-zoom-foto .modal-card {
+      background: transparent;
+      box-shadow: none;
+    }
+    #modal-zoom-foto img {
+      width: 100%;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+
+    /* =============================================
+       TAB: RIWAYAT
+    ============================================= */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .summary-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 8px;
+      text-align: center;
+    }
+    .summary-card .num {
+      font-size: 20px;
+      font-weight: 800;
+      margin-bottom: 2px;
+    }
+    .summary-card .lbl {
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .text-success { color: #10b981; }
+    .text-warning { color: #f59e0b; }
+    .text-primary { color: #2563eb; }
+
+    .riwayat-card-item {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 10px;
+      box-shadow: var(--shadow-sm);
+    }
+    .riwayat-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #f1f5f9;
+    }
+    .riwayat-date {
+      font-size: 13px;
+      font-weight: 700;
+      color: #1e293b;
+    }
+    .riwayat-body-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .riwayat-subcol {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .riwayat-thumb {
+      width: 44px;
+      height: 44px;
+      border-radius: 8px;
+      object-fit: cover;
+      border: 1.5px solid var(--border);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .riwayat-thumb-ph {
+      width: 44px;
+      height: 44px;
+      border-radius: 8px;
+      background: #f1f5f9;
+      border: 1.5px dashed var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+    .riwayat-subcol-info {
+      font-size: 11px;
+      line-height: 1.3;
+    }
+    .riwayat-subcol-info .lbl {
+      color: var(--muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 9px;
+    }
+    .riwayat-subcol-info .val {
+      font-weight: 700;
+      color: #1e293b;
+      font-size: 13px;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 36px 16px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    /* Spinner */
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255,255,255,0.4);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .btn-outline-izin {
+      width: 100%;
+      background: transparent;
+      border: 1.5px dashed #94a3b8;
+      color: #64748b;
+      font-size: 13px;
+      font-weight: 600;
+      margin-top: 12px;
+      padding: 11px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s;
+    }
+    .btn-outline-izin:hover {
+      border-color: #2563eb;
+      color: #2563eb;
+      background: #eff6ff;
+    }
+    .radio-izin-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #334155;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .radio-izin-label.active {
+      border-color: #2563eb;
+      background: #eff6ff;
+      color: #2563eb;
+    }
+    .radio-izin-label input {
+      display: none;
+    }
+
+    /* Touch target padding for mobile */
+    @media (max-width: 520px) {
+      body {
+        background: var(--bg);
+      }
+      .app-viewport {
+        box-shadow: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-viewport">
+
+  <!-- ========================================================
+       PAGE 1: LOGIN (Guru & Pegawai)
+  ======================================================== -->
+  <div id="page-login" class="page active">
+    <div class="login-brand">
+      <div class="brand-icon">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 21h18M3 10h18M5 10v11M19 10v11M12 3l9 7H3l9-7zM12 14v4M9 14v4M15 14v4"/>
+        </svg>
+      </div>
+      <h1>Global Nusantara</h1>
+      <p>Sistem Presensi Kepegawaian</p>
+    </div>
+
+    <div class="login-card">
+      <h2>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--primary)">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+        <span>Masuk ke Akun</span>
+      </h2>
+      <div id="login-alert" class="alert"></div>
+
+      <form id="form-login" onsubmit="event.preventDefault(); doLogin();">
+        <div class="form-group">
+          <label for="nip">NIP / Akun Pegawai</label>
+          <div class="form-input-wrap">
+            <input type="text" id="nip" placeholder="Masukkan NIP Anda" autocomplete="username" inputmode="numeric" required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Kata Sandi</label>
+          <div class="form-input-wrap">
+            <input type="password" id="password" placeholder="Masukkan kata sandi" autocomplete="current-password" required />
+            <button type="button" class="btn-eye" onclick="togglePassword()" aria-label="Lihat kata sandi">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-masuk" id="btn-login-submit">
+          <span id="login-btn-text">Masuk</span>
+        </button>
+      </form>
+
+      <div class="login-helper">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--primary); flex-shrink:0; margin-top:2px;">
+          <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
+        </svg>
+        <span>Akun pegawai didaftarkan oleh Administrator Tata Usaha. Hubungi TU jika belum memiliki akun.</span>
+      </div>
+    </div>
+
+    <div class="login-portal-link">
+      <a href="../index.html">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+        </svg>
+        <span>Kembali ke Portal Utama</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- ========================================================
+       PAGE 2: DASHBOARD PRESENSI PEGAWAI & GURU
+  ======================================================== -->
+  <div id="page-home" class="page">
+    
+    <!-- Topbar Profile -->
+    <header class="topbar">
+      <div class="user-profile-header">
+        <div class="user-avatar" id="user-avatar-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+          </svg>
+        </div>
+        <div class="user-info-text">
+          <div class="user-nama" id="user-nama">–</div>
+          <div class="user-meta" id="user-meta">–</div>
+        </div>
+      </div>
+      <button class="btn-logout" onclick="doLogout()">
+        <span>Keluar</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+      </button>
+    </header>
+
+    <!-- Tab Navigation -->
+    <nav class="tab-bar">
+      <button class="tab-btn active" id="btn-tab-presensi" onclick="switchTab('presensi')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        <span>Presensi Hari Ini</span>
+      </button>
+      <button class="tab-btn" id="btn-tab-riwayat" onclick="switchTab('riwayat')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <span>Riwayat Kehadiran</span>
+      </button>
+    </nav>
+
+    <!-- ==================== TAB 1: PRESENSI ==================== -->
+    <main id="tab-presensi" class="tab-content active">
+
+      <!-- Time & Realtime Status Widget -->
+      <section class="card time-card">
+        <div class="time-date" id="jam-tanggal">–</div>
+        <div class="time-clock" id="jam-waktu">00:00:00</div>
+        <div class="status-badge-wrap">
+          <div id="presensi-status-badge" class="status-badge status-badge-idle">
+            <span class="status-dot"></span>
+            <span id="presensi-status-label">Memeriksa Status…</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- GPS Geofencing Location Card -->
+      <section class="card">
+        <div class="card-title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--primary)"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <span>Lokasi Presensi (Geofencing)</span>
+        </div>
+        
+        <div id="map"></div>
+
+        <div id="gps-status-box" class="gps-status-box gps-out-radius">
+          <span id="gps-status-icon">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+          </span>
+          <span id="gps-status-text">Mendeteksi koordinat GPS…</span>
+        </div>
+
+        <div class="gps-info-grid">
+          <div class="gps-info-item">
+            <span>Koordinat Anda</span>
+            <span id="gps-koordinat-text">–</span>
+          </div>
+          <div class="gps-info-item">
+            <span>Jarak ke Sekolah</span>
+            <span id="gps-jarak-text">–</span>
+          </div>
+        </div>
+
+        <button class="btn btn-secondary btn-sm" onclick="refreshLokasi()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+          <span>Perbarui Lokasi GPS</span>
+        </button>
+      </section>
+
+      <!-- Alert Notifikasi -->
+      <div id="presensi-alert" class="alert"></div>
+
+      <!-- Action Panel: Alur Bertahap (Masuk vs Pulang vs Selesai) -->
+      <section class="action-panel">
+        
+        <!-- State 1: Tombol Absen Masuk (Hanya muncul jika belum absen masuk) -->
+        <div id="action-masuk-wrap" style="display:none">
+          <button class="btn btn-masuk" id="btn-trigger-masuk" onclick="bukaModalKamera('masuk')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            <span>Absen Masuk Sekarang</span>
+          </button>
+          <button type="button" class="btn-outline-izin" id="btn-trigger-izin" onclick="bukaModalIzin()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+            <span>Berhalangan Hadir? Ajukan Izin / Sakit</span>
+          </button>
+        </div>
+
+        <!-- State 2: Info Sudah Masuk & Tombol Absen Pulang (Hanya muncul setelah absen masuk) -->
+        <div id="action-pulang-wrap" style="display:none">
+          <div class="masuk-success-banner">
+            <div class="masuk-banner-header">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>Absen Masuk Tercatat</span>
+            </div>
+            <div id="detail-jam-masuk-text">Jam: –</div>
+          </div>
+          
+          <button class="btn btn-pulang" id="btn-trigger-pulang" onclick="bukaModalKamera('pulang')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            <span>Absen Pulang Sekarang</span>
+          </button>
+        </div>
+
+        <!-- State 3: Selesai Hari Ini (Sudah Masuk & Sudah Pulang) -->
+        <div id="action-selesai-wrap" style="display:none" class="card-completed">
+          <div class="completed-icon-wrap">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </div>
+          <h3>Presensi Hari Ini Lengkap</h3>
+          <p id="detail-selesai-text">
+            Anda telah menyelesaikan Absen Masuk dan Absen Pulang hari ini. Terima kasih atas dedikasi dan pengabdian Anda!
+          </p>
+        </div>
+
+        <!-- State 4: Info Izin / Sakit Tercatat Hari Ini -->
+        <div id="action-izin-info-wrap" style="display:none" class="card-completed" style="border-color:#38bdf8; background:#f0f9ff;">
+          <div class="completed-icon-wrap" style="background:#e0f2fe; color:#0284c7;">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          </div>
+          <h3 id="izin-info-title" style="color:#0369a1">Pengajuan Izin / Sakit Tercatat</h3>
+          <p id="izin-info-text" style="color:#475569">
+            Pengajuan Anda telah tercatat dalam sistem presensi untuk hari ini.
+          </p>
+        </div>
+
+      </section>
+
+    </main>
+
+    <!-- ==================== TAB 2: RIWAYAT ==================== -->
+    <main id="tab-riwayat" class="tab-content">
+      
+      <!-- Summary Box -->
+      <div class="summary-grid">
+        <div class="summary-card">
+          <div class="num text-success" id="sum-hadir">0</div>
+          <div class="lbl">Hadir</div>
+        </div>
+        <div class="summary-card">
+          <div class="num text-warning" id="sum-terlambat">0</div>
+          <div class="lbl">Terlambat</div>
+        </div>
+        <div class="summary-card">
+          <div class="num text-primary" id="sum-total">0</div>
+          <div class="lbl">Total</div>
+        </div>
+      </div>
+
+      <div class="card" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <span style="font-size:13px; font-weight:700; color:#1e293b">Daftar Kehadiran Anda</span>
+        <button class="btn btn-secondary btn-sm" style="width:auto; padding:6px 12px" onclick="loadRiwayatPresensi()">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+          <span>Muat Ulang</span>
+        </button>
+      </div>
+
+      <!-- Riwayat List Container -->
+      <div id="riwayat-container">
+        <div class="empty-state">Memuat data riwayat…</div>
+      </div>
+
+    </main>
+
+  </div><!-- /page-home -->
+
+</div><!-- /app-viewport -->
+
+<!-- ========================================================
+     MODAL POP-UP: KAMERA SELFIE (MediaDevices API)
+======================================================== -->
+<div id="modal-kamera" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-kamera-title">Ambil Foto Selfie Presensi</div>
+      <button class="btn-close-modal" onclick="tutupModalKamera()" aria-label="Tutup">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="camera-frame">
+        <!-- Live Video Viewfinder -->
+        <video id="kamera-video" autoplay playsinline muted></video>
+        <!-- Snapshot Preview (muncul setelah jepret) -->
+        <img id="kamera-snapshot" style="display:none" alt="Snapshot Foto" />
+        <div class="camera-overlay-badge" id="camera-badge-text">
+          <span class="live-indicator-dot"></span>
+          <span id="camera-badge-label">Kamera Live</span>
+        </div>
+      </div>
+      <canvas id="kamera-canvas" style="display:none"></canvas>
+
+      <div id="modal-camera-alert" class="alert"></div>
+
+      <!-- Kontrol Tahap 1: Live Video (Ambil Foto) -->
+      <div id="kamera-controls-live" class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="tutupModalKamera()">Batal</button>
+        <button type="button" class="btn btn-masuk" onclick="jepretFoto()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
+          <span>Ambil Foto</span>
+        </button>
+      </div>
+
+      <!-- Kontrol Tahap 2: Snapshot Preview (Konfirmasi / Ulangi) -->
+      <div id="kamera-controls-preview" class="modal-footer" style="display:none">
+        <button type="button" class="btn btn-secondary" onclick="ulangiFoto()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+          <span>Ulangi</span>
+        </button>
+        <button type="button" class="btn btn-pulang" id="btn-submit-absensi" onclick="kirimPresensi()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          <span id="btn-submit-text">Kirim Presensi</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================================
+     MODAL POP-UP: ZOOM FOTO RIWAYAT
+======================================================== -->
+<div id="modal-zoom-foto" class="modal-overlay" onclick="tutupModalZoom()">
+  <div class="modal-card">
+    <div class="modal-header" style="background:#fff">
+      <div class="modal-title" id="zoom-foto-title">Foto Presensi</div>
+      <button class="btn-close-modal" onclick="tutupModalZoom()" aria-label="Tutup">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" style="background:#060d17">
+      <img id="zoom-foto-img" src="" alt="Bukti Foto Presensi" />
+    </div>
+  </div>
+</div>
+
+<!-- ========================================================
+     MODAL POP-UP: FORMULIR PENGAJUAN IZIN / SAKIT
+======================================================== -->
+<div id="modal-izin" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-header" style="background:#fff">
+      <div class="modal-title">Formulir Keterangan Izin / Sakit</div>
+      <button class="btn-close-modal" onclick="tutupModalIzin()" aria-label="Tutup">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <div class="modal-body" style="padding: 16px 20px; background:#fff;">
+      <div id="izin-alert" class="alert"></div>
+
+      <div style="margin-bottom: 14px;">
+        <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:8px;">Jenis Pengajuan</label>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+          <label class="radio-izin-label active" id="label-radio-sakit" onclick="pilihTipeIzin('sakit')">
+            <input type="radio" name="tipe_izin" id="radio-sakit" value="sakit" checked>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+            <span>Sakit</span>
+          </label>
+          <label class="radio-izin-label" id="label-radio-izin" onclick="pilihTipeIzin('izin')">
+            <input type="radio" name="tipe_izin" id="radio-izin" value="izin">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <span>Izin</span>
+          </label>
+        </div>
+      </div>
+
+      <div style="margin-bottom: 14px;">
+        <label for="keterangan-izin" style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:6px;">Alasan / Keterangan Lengkap</label>
+        <textarea id="keterangan-izin" rows="3" placeholder="Contoh: Mengalami demam dan flu, sedang istirahat di rumah." style="width:100%; border:1.5px solid #cbd5e1; border-radius:10px; padding:10px; font-family:inherit; font-size:13px; color:#1e293b; resize:vertical; outline:none; box-sizing:border-box;"></textarea>
+      </div>
+
+      <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:10px 12px; margin-bottom:16px; font-size:11px; color:#64748b; line-height:1.5;">
+        Pengajuan dicatat berdasarkan keterangan tertulis mandiri (tanpa unggah berkas/surat fisik) dan tidak memerlukan radius GPS sekolah. Status langsung tercatat pada portal Tata Usaha hari ini.
+      </div>
+
+      <div style="display:flex; gap:10px;">
+        <button type="button" class="btn btn-secondary" onclick="tutupModalIzin()" style="flex:1;">Batal</button>
+        <button type="button" class="btn btn-masuk" id="btn-submit-izin" onclick="kirimPengajuanIzin()" style="flex:2;">
+          <span id="btn-submit-izin-text">Kirim Pengajuan</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Leaflet JS & App JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

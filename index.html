@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Global Nusantara — Sistem Presensi Guru & Pegawai</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    /* ========================================================
+       GLOBAL NUSANTARA INSTITUTIONAL THEME
+       Deep Oxford Navy, Crest Gold, Clean Whites & Sleek Slates
+       ======================================================== */
+    :root {
+      --navy-950: #060d17;
+      --navy-900: #0a192f;
+      --navy-850: #0f2444;
+      --navy-800: #142d54;
+      --navy-700: #1e3a8a;
+      
+      --gold-500: #c59b27;
+      --gold-400: #d4af37;
+      --gold-300: #e6ca65;
+      --gold-100: #fbf6e2;
+      
+      --slate-900: #0f172a;
+      --slate-800: #1e293b;
+      --slate-600: #475569;
+      --slate-500: #64748b;
+      --slate-400: #94a3b8;
+      --slate-200: #e2e8f0;
+      --slate-100: #f1f5f9;
+      --slate-50:  #f8fafc;
+      --white:     #ffffff;
+
+      --emerald-600: #059669;
+      --emerald-500: #10b981;
+      --emerald-50:  #ecfdf5;
+
+      --amber-600: #d97706;
+      --amber-50:  #fffbeb;
+
+      --blue-600:  #2563eb;
+      --blue-50:   #eff6ff;
+
+      --font-heading: 'Cinzel', serif;
+      --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      
+      --shadow-sm: 0 1px 3px rgba(10, 25, 47, 0.05);
+      --shadow-md: 0 4px 14px rgba(10, 25, 47, 0.08);
+      --shadow-lg: 0 12px 32px rgba(10, 25, 47, 0.12);
+      --shadow-xl: 0 20px 45px rgba(10, 25, 47, 0.2);
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: var(--font-body);
+      color: var(--slate-800);
+      background-color: var(--slate-50);
+      line-height: 1.6;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ---- TOP BAR ---- */
+    .top-bar {
+      background: var(--navy-950);
+      color: var(--slate-400);
+      font-size: 0.8rem;
+      border-bottom: 1px solid rgba(197, 155, 39, 0.2);
+      padding: 9px 0;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+    .top-bar-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .badge-gold {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(197, 155, 39, 0.12);
+      color: var(--gold-400);
+      padding: 3px 12px;
+      border-radius: 20px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+      border: 1px solid rgba(197, 155, 39, 0.3);
+    }
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--gold-400);
+      box-shadow: 0 0 6px var(--gold-400);
+    }
+
+    /* ---- NAVBAR ---- */
+    .navbar {
+      background: rgba(10, 25, 47, 0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(197, 155, 39, 0.25);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: var(--shadow-md);
+    }
+    .navbar-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 78px;
+    }
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      text-decoration: none;
+    }
+    .crest-icon {
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, var(--navy-900), var(--navy-850));
+      border: 1.5px solid var(--gold-400);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--gold-400);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+    }
+    .brand-title {
+      font-family: var(--font-heading);
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--white);
+      letter-spacing: 0.8px;
+      line-height: 1.2;
+    }
+    .brand-subtitle {
+      font-size: 0.7rem;
+      color: var(--gold-400);
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+    .nav-links {
+      display: flex;
+      list-style: none;
+      gap: 28px;
+      align-items: center;
+    }
+    .nav-link {
+      color: var(--slate-400);
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 600;
+      transition: color 0.2s;
+    }
+    .nav-link:hover {
+      color: var(--gold-300);
+    }
+
+    /* ---- HERO SECTION ---- */
+    .hero {
+      background: linear-gradient(160deg, var(--navy-950) 0%, var(--navy-900) 50%, var(--navy-850) 100%);
+      color: var(--white);
+      padding: 85px 0 95px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -10%; right: -5%;
+      width: 500px; height: 500px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(197, 155, 39, 0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.25fr 0.95fr;
+      gap: 50px;
+      align-items: center;
+    }
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(197, 155, 39, 0.15);
+      border: 1px solid rgba(197, 155, 39, 0.3);
+      color: var(--gold-400);
+      padding: 6px 16px;
+      border-radius: 30px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+    .hero-title {
+      font-family: var(--font-heading);
+      font-size: 2.75rem;
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 20px;
+      letter-spacing: -0.5px;
+    }
+    .hero-title span {
+      color: var(--gold-400);
+      text-shadow: 0 0 20px rgba(212, 175, 55, 0.25);
+    }
+    .hero-desc {
+      font-size: 1.05rem;
+      color: var(--slate-400);
+      line-height: 1.7;
+      margin-bottom: 34px;
+      max-width: 560px;
+    }
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-bottom: 40px;
+    }
+    .btn-hero-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: linear-gradient(135deg, var(--gold-500), var(--gold-400));
+      color: var(--navy-950);
+      padding: 15px 28px;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-weight: 800;
+      text-decoration: none;
+      box-shadow: 0 4px 18px rgba(197, 155, 39, 0.35);
+      transition: all 0.2s;
+    }
+    .btn-hero-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(197, 155, 39, 0.5);
+    }
+    .btn-hero-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255,255,255,0.08);
+      border: 1.5px solid rgba(197, 155, 39, 0.3);
+      color: var(--white);
+      padding: 15px 26px;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .btn-hero-secondary:hover {
+      background: rgba(255,255,255,0.15);
+      border-color: var(--gold-400);
+      transform: translateY(-2px);
+    }
+
+    /* Hero Stats Bar */
+    .hero-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      padding-top: 24px;
+    }
+    .hero-stat-card h4 {
+      font-size: 1.55rem;
+      font-weight: 800;
+      color: var(--gold-400);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .hero-stat-card p {
+      font-size: 0.78rem;
+      color: var(--slate-400);
+      font-weight: 500;
+    }
+
+    /* Hero Right Showcase Card */
+    .showcase-card {
+      background: rgba(14, 31, 56, 0.7);
+      border: 1px solid var(--gold-500);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      box-shadow: var(--shadow-xl);
+      backdrop-filter: blur(14px);
+    }
+    .showcase-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      padding-bottom: 16px;
+      margin-bottom: 20px;
+    }
+    .showcase-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .status-live-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+    .showcase-item {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      transition: background 0.2s;
+    }
+    .showcase-item:hover {
+      background: rgba(255,255,255,0.08);
+    }
+    .showcase-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: rgba(197, 155, 39, 0.15);
+      color: var(--gold-400);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    .showcase-info h5 {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 2px;
+    }
+    .showcase-info p {
+      font-size: 0.74rem;
+      color: var(--slate-400);
+    }
+
+    /* ---- SECTION: TWO MAIN GATES ---- */
+    .section {
+      padding: 80px 0;
+    }
+    .section-title-wrap {
+      text-align: center;
+      max-width: 680px;
+      margin: 0 auto 50px;
+    }
+    .section-eyebrow {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--gold-500);
+      margin-bottom: 8px;
+      display: block;
+    }
+    .section-title {
+      font-family: var(--font-heading);
+      font-size: 2.1rem;
+      font-weight: 800;
+      color: var(--navy-950);
+      line-height: 1.25;
+      margin-bottom: 12px;
+    }
+    .section-desc {
+      font-size: 0.95rem;
+      color: var(--slate-600);
+    }
+
+
+    /* ---- SECTION: RULES & SCHEDULE ---- */
+    .section-rules {
+      background: #edf2f7;
+      border-top: 1px solid var(--slate-200);
+      border-bottom: 1px solid var(--slate-200);
+    }
+    .rules-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+    .rule-card {
+      background: var(--white);
+      border-radius: var(--radius-md);
+      padding: 24px 20px;
+      border: 1px solid #cbd5e1;
+      box-shadow: var(--shadow-sm);
+    }
+    .rule-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      margin-bottom: 14px;
+    }
+    .rule-card:nth-child(1) .rule-icon { background: #dcfce7; color: #166534; }
+    .rule-card:nth-child(2) .rule-icon { background: #dbeafe; color: #1e40af; }
+    .rule-card:nth-child(3) .rule-icon { background: #fef3c7; color: #92400e; }
+    .rule-card:nth-child(4) .rule-icon { background: #f3e8ff; color: #6b21a8; }
+    
+    .rule-card h4 {
+      font-size: 0.98rem;
+      font-weight: 700;
+      color: var(--navy-950);
+      margin-bottom: 6px;
+    }
+    .rule-card p {
+      font-size: 0.82rem;
+      color: var(--slate-600);
+      line-height: 1.5;
+    }
+
+    /* ---- FOOTER ---- */
+    .footer {
+      background: var(--navy-950);
+      color: var(--slate-400);
+      border-top: 1px solid rgba(197, 155, 39, 0.2);
+      padding: 60px 0 30px;
+      font-size: 0.85rem;
+    }
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 1fr;
+      gap: 40px;
+      margin-bottom: 40px;
+    }
+    .footer-brand h3 {
+      font-family: var(--font-heading);
+      color: #fff;
+      font-size: 1.15rem;
+      margin-bottom: 10px;
+    }
+    .footer-brand p {
+      line-height: 1.6;
+      max-width: 380px;
+      font-size: 0.82rem;
+    }
+    .footer-col h4 {
+      font-size: 0.85rem;
+      color: var(--gold-400);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 14px;
+      font-weight: 700;
+    }
+    .footer-links {
+      list-style: none;
+    }
+    .footer-links li {
+      margin-bottom: 8px;
+    }
+    .footer-links a {
+      color: var(--slate-400);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .footer-links a:hover {
+      color: var(--gold-300);
+    }
+    .footer-bottom {
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      padding-top: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      font-size: 0.78rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 992px) {
+      .hero-grid { grid-template-columns: 1fr; gap: 40px; }
+      .rules-grid { grid-template-columns: repeat(2, 1fr); }
+      .footer-grid { grid-template-columns: 1fr; gap: 30px; }
+      .nav-links { display: none; }
+    }
+    @media (max-width: 600px) {
+      .hero-title { font-size: 2.1rem; }
+      .rules-grid { grid-template-columns: 1fr; }
+      .hero-actions { flex-direction: column; }
+      .btn-hero-primary, .btn-hero-secondary { width: 100%; justify-content: center; }
+      .hero-stats-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Informational Bar -->
+  <aside class="top-bar">
+    <div class="container top-bar-inner">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span class="badge-gold">
+          <span class="badge-dot"></span>
+          <span>Sistem Presensi Resmi Kepegawaian</span>
+        </span>
+        <span style="font-size:0.75rem; opacity:0.8;">SMK Global Nusantara</span>
+      </div>
+      <div id="live-clock" style="font-size:0.75rem; font-weight:600; color:var(--slate-300);">
+        Memuat waktu…
+      </div>
+    </div>
+  </aside>
+
+  <!-- Navbar -->
+  <header class="navbar">
+    <div class="container navbar-inner">
+      <a href="index.html" class="brand-group">
+        <div class="crest-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 21h18M3 10h18M5 10v11M19 10v11M12 3l9 7H3l9-7zM12 14v4M9 14v4M15 14v4"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <span class="brand-title">Global Nusantara</span>
+          <span class="brand-subtitle">Attendance System</span>
+        </div>
+      </a>
+
+      <nav>
+        <ul class="nav-links">
+          <li><a href="#beranda" class="nav-link">Beranda</a></li>
+          <li><a href="#ketentuan" class="nav-link">Ketentuan Jam Kerja</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero" id="beranda">
+    <div class="container">
+      <div class="hero-grid">
+        
+        <!-- Left Content -->
+        <div>
+          <div class="hero-eyebrow">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <span>Mobile Computing Attendance Solution</span>
+          </div>
+          <h1 class="hero-title">
+            Integritas & Akuntabilitas Kehadiran Pegawai <span>Global Nusantara</span>.
+          </h1>
+          <p class="hero-desc">
+            Sistem presensi komputasi bergerak untuk seluruh jajaran guru dan tenaga kependidikan sekolah. Terintegrasi dengan validasi radius GPS (Geofencing), verifikasi kamera selfie real-time, dan alur bertahap Absen Masuk & Pulang.
+          </p>
+
+          <div class="hero-actions">
+            <a href="frontend/index.html" class="btn-hero-primary">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+              <span>Presensi Guru & Pegawai</span>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+            <a href="admin/login.php" class="btn-hero-secondary">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              <span>Login Administrator TU</span>
+            </a>
+          </div>
+
+          <div class="hero-stats-grid">
+            <div class="hero-stat-card">
+              <h4>150m</h4>
+              <p>Radius Toleransi GPS Kampus</p>
+            </div>
+            <div class="hero-stat-card">
+              <h4>100%</h4>
+              <p>Verifikasi Foto Kamera Live</p>
+            </div>
+            <div class="hero-stat-card">
+              <h4>Real-Time</h4>
+              <p>Sinkronisasi Presensi ke TU</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Showcase Card -->
+        <div>
+          <div class="showcase-card">
+            <div class="showcase-header">
+              <div class="showcase-title">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                <span>Parameter Presensi Harian</span>
+              </div>
+              <div class="status-live-pill">
+                ● SISTEM AKTIF
+              </div>
+            </div>
+
+            <div class="showcase-item">
+              <div class="showcase-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </div>
+              <div class="showcase-info">
+                <h5>Jam Masuk Kerja (06.00 – 07.15 WIB)</h5>
+                <p>Presensi setelah 07.15 WIB otomatis tercatat berstatus Terlambat</p>
+              </div>
+            </div>
+
+            <div class="showcase-item">
+              <div class="showcase-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+              </div>
+              <div class="showcase-info">
+                <h5>Jam Pulang Kerja (Mulai 15.00 WIB)</h5>
+                <p>Tombol Absen Pulang hanya aktif setelah pegawai sukses Absen Masuk</p>
+              </div>
+            </div>
+
+            <div class="showcase-item">
+              <div class="showcase-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              </div>
+              <div class="showcase-info">
+                <h5>Geofencing Titik Kampus Sekolah</h5>
+                <p>Verifikasi jarak otomatis via GPS untuk memastikan keberadaan di lokasi</p>
+              </div>
+            </div>
+
+            <div class="showcase-item">
+              <div class="showcase-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+              </div>
+              <div class="showcase-info">
+                <h5>Foto Selfie Kamera Langsung</h5>
+                <p>Pop-up kamera instan untuk validasi fisik dan mencegah titip absen</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- Section: Ketentuan Jam Kerja -->
+  <section class="section section-rules" id="ketentuan">
+    <div class="container">
+      <div class="section-title-wrap">
+        <span class="section-eyebrow">Tata Tertib & Disiplin</span>
+        <h2 class="section-title">Ketentuan Presensi Kepegawaian</h2>
+        <p class="section-desc">
+          Aturan standar kehadiran yang diberlakukan di lingkungan SMK Global Nusantara.
+        </p>
+      </div>
+
+      <div class="rules-grid">
+        <div class="rule-card">
+          <div class="rule-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <h4>Jam Masuk Kerja</h4>
+          <p>Presensi masuk dibuka pukul 06.00 WIB. Tepat waktu tercatat hingga pukul 07.15 WIB. Presensi di atas 07.15 WIB otomatis berstatus Terlambat.</p>
+        </div>
+
+        <div class="rule-card">
+          <div class="rule-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          </div>
+          <h4>Jam Pulang Kerja</h4>
+          <p>Tombol Absen Pulang dapat diakses mulai pukul 15.00 WIB dan hanya aktif setelah pegawai menyelesaikan Absen Masuk.</p>
+        </div>
+
+        <div class="rule-card">
+          <div class="rule-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          </div>
+          <h4>Area Geofencing</h4>
+          <p>Presensi wajib dilakukan di dalam area sekolah dengan radius toleransi maksimal 150 meter dari titik pusat kampus.</p>
+        </div>
+
+        <div class="rule-card">
+          <div class="rule-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          </div>
+          <h4>Bukti Foto Selfie</h4>
+          <p>Wajib mengambil foto wajah secara langsung melalui kamera web tanpa menggunakan file dari galeri ponsel.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <h3>SMK Global Nusantara</h3>
+          <p>
+            Sistem Informasi Presensi Pegawai & Guru berbasis Komputasi Bergerak (*Mobile Computing*). Mengedepankan transparansi, integritas, dan ketepatan waktu.
+          </p>
+        </div>
+
+        <div class="footer-col">
+          <h4>Navigasi Halaman</h4>
+          <ul class="footer-links">
+            <li><a href="#beranda">Beranda Utama</a></li>
+            <li><a href="#ketentuan">Ketentuan Jam Kerja</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Kontak Tata Usaha</h4>
+          <p style="font-size:0.8rem; line-height:1.6; color:var(--slate-400);">
+            Gedung Administrasi Pusat TU<br>
+            Jl. Pendidikan No. 1, Nusantara<br>
+            WhatsApp TU: 0812-3456-7890<br>
+            Email: tu@globalnusantara.sch.id
+          </p>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div>
+          © 2026 SMK Global Nusantara. Seluruh Hak Cipta Dilindungi.
+        </div>
+        <div style="color:var(--gold-400); font-weight:600;">
+          Status Server: Aktif & Terenkripsi
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Live Clock WIB
+    function updateClock() {
+      const now = new Date();
+      const el = document.getElementById('live-clock');
+      if (el) {
+        el.textContent = now.toLocaleDateString('id-ID', {
+          weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+        }) + ' • ' + now.toLocaleTimeString('id-ID', { hour12: false }) + ' WIB';
+      }
+    }
+    updateClock();
+    setInterval(updateClock, 1000);
+  </script>
+</body>
+</html>
